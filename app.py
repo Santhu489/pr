@@ -1,29 +1,35 @@
-import pandas as pd
 import streamlit as st
+import pandas as pd
 
-# Load your dataset and do any necessary preprocessing here
-genes = pd.read_csv("sfari_genes.csv")
+# Load CSV file
+file_path = st.file_uploader("sfari_genes.csv", type=["csv"])
 
-def check_gene(gene_symbol):
-    if gene_symbol in genes['gene-symbol'].values:
-        gene_info = genes[genes['gene-symbol'] == gene_symbol]
+# Check if a file is uploaded
+if file_path is not None:
+    # Read CSV file into DataFrame
+    df = pd.read_csv(file_path)
 
-        if gene_info['syndromic'].values[0] == 1:
-            result = f"The gene {gene_symbol} is associated with autism."
+    # Display DataFrame
+    st.write("## Displaying CSV Data")
+    st.dataframe(df)
+
+    # Prediction Section
+    st.write("## Autism Gene Prediction")
+
+    # User input for gene symbol
+    gene_symbol = st.text_input("Enter a gene symbol:")
+
+    if st.button("Predict"):
+        # Check if the gene symbol exists in the data
+        if gene_symbol in df['gene-symbol'].values:
+            # Extract the corresponding row from the dataframe
+            gene_info = df[df['gene-symbol'] == gene_symbol]
+
+            # Check if the gene is syndromic or not
+            if gene_info['syndromic'].values[0] == 1:
+                st.write(f"The gene {gene_symbol} is associated with autism.")
+            else:
+                st.write(f"The gene {gene_symbol} is not associated with autism.")
         else:
-            result = f"The gene {gene_symbol} is not associated with autism."
-    else:
-        result = "The gene symbol does not exist in the data."
+            st.write("The gene symbol does not exist in the data.")
 
-    return result
-
-def main():
-    st.title("Autism gene predictor")
-
-    gene_symbol = st.text_input("Enter Gene Symbol:")
-    if st.button("Check"):
-        result = check_gene(gene_symbol)
-        st.write(result)
-
-if __name__ == "__main__":
-    main()
