@@ -1,0 +1,2 @@
+streamlit==1.7.1
+pandas==1.4.1  # (or the version you are using)
